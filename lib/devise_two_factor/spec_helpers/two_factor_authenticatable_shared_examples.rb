@@ -76,8 +76,13 @@ RSpec.shared_examples 'two_factor_authenticatable' do
       expect(subject.validate_and_consume_otp!(otp)).to be false
     end
 
-    it 'validates an OTP within the allowed drift' do
+    it 'validates an OTP within the allowed drift, ahead' do
       otp = ROTP::TOTP.new(otp_secret).at(Time.now + subject.class.otp_allowed_drift)
+      expect(subject.validate_and_consume_otp!(otp)).to be true
+    end
+
+    it 'validates an OTP within the allowed drift, behind' do
+      otp = ROTP::TOTP.new(otp_secret).at(Time.now - subject.class.otp_allowed_drift)
       expect(subject.validate_and_consume_otp!(otp)).to be true
     end
 
